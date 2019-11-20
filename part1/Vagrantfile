@@ -1,74 +1,43 @@
-#!/bin/sh
-# Maintainer Ana Schneider ing.anacs@gmail.com
+# -*- mode: ruby -*-
+# vi: set ft=ruby sw=2 st=2 et :
 
-set -e
-set -u
+# Maintainer : Ana SCHNEIDER ing.anacs@gmail.com
+# We will create 5 servers :
+# s0.infra, s1.infra ... s4.infra
+#
+# Use debian buster for our servers
+Vagrant.configure("2") do |config|
+  config.vm.box = "debian/buster64"
+  config.vm.box_check_update = false
 
-HOSTNAME="$(hostname)"
+  # Limit memory of our servers
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1200"
+    vb.gui = false
+  end
 
-export DEBIAN_FRONTEND=noninteractive
+  # Create a  cache for APT
+  # config.vm.synced_folder 'v-cache', '/var/cache/apt'
+  # Create s0.infra with intranet (eth1) and internet (eth0)
+  config.vm.define 'control' do |machine|
+    machine.vm.hostname = 'control'
+    machine.vm.network "private_network", bridge: "eth0", ip: "192.168.50.200"
+    machine.vm.network "private_network", bridge: "eth1", ip: "10.0.0.10"
+  end
 
-# install the basic items we need
-apt-get update
-apt-get install -y \
-    apt-transport-https \
-    ca-certificates \
-    git \
-    curl \
-    wget \
-    vim \
-    gnupg2 \
-    python3 \
-    software-properties-common
+  # Create our servers (1 to 4) with intranet and internet
+  4.times do |idx|
+    config.vm.define "s#{idx + 1}.infra" do |machine|
+      machine.vm.hostname = "server#{idx + 1}.infra" 
+      machine.vm.network "private_network", ip: "192.168.50.#{idx + 1 * 10 + 10}"
+      machine.vm.network "private_network", ip: "10.0.0.#{idx + 11}"
+      if idx == 0 
+        machine.vm.network "forwarded_port", guest: 80, host: 1080
+        machine.vm.network "forwarded_port", guest: 8080, host: 8080
+      end
+    end
+  end
 
-if [ "$HOSTNAME" = "control" ]; then
-	apt-get install -y \
-		ansible	
-
-	# Add ssh-keys to s0.infra
-	mkdir -p /root/.ssh
-	cp /vagrant/fp_part1_rsa /home/vagrant/.ssh/fp_part1_rsa
-	cp /vagrant/fp_part1_rsa.pub /home/vagrant/.ssh/fp_part1_rsa.pub
-	chmod 0600 /home/vagrant/.ssh/*_rsa # ICI
-	chown -R vagrant:vagrant /home/vagrant/.ssh
-
-	sed -i \
-		-e '/## BEGIN PROVISION/,/## END PROVISION/d' \
-		/home/vagrant/.bashrc
-	cat >> /home/vagrant/.bashrc <<-MARK
-	## BEGIN PROVISION
-	eval \$(ssh-agent -s)
-	ssh-add ~/.ssh/*_rsa
-	## END PROVISION
-	MARK
-fi
-
-sed -i \
-	-e '/^## BEGIN PROVISION/,/^## END PROVISION/d' \
-	/etc/hosts
-cat >> /etc/hosts <<MARK
-## BEGIN PROVISION
-192.168.50.200      s0.infra
-192.168.50.10       s1.infra
-192.168.50.20       s2.infra
-192.168.50.30       s3.infra
-192.168.50.40       s4.infra
-## END PROVISION
-MARK
-
-# J'autorise la clef sur tous les serveurs
-mkdir -p /root/.ssh
-cat /vagrant/ansible_rsa.pub >> /root/.ssh/authorized_keys
-
-# Je vire les duplicata (potentiellement gênant pour SSH)
-sort -u /root/.ssh/authorized_keys > /root/.ssh/authorized_keys.tmp
-mv /root/.ssh/authorized_keys.tmp /root/.ssh/authorized_keys
-
-# Je corrige les permissions
-touch /root/.ssh/config
-chmod 0600 /root/.ssh/*
-chmod 0644 /root/.ssh/config
-chmod 0700 /root/.ssh
-
-echo "SUCCESS."
+  config.vm.provision "shell", path: "provision.sh"
+end
 

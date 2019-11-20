@@ -1,0 +1,32 @@
+---
+# install DNSmasq and HAProxy on s0.infra
+- hosts: control
+  tasks:
+    - name: install DNSmasq
+      apt:
+        name: ['dnsmasq', 'haproxy']
+        state: present
+
+# install Apache and PHP on s1 and s2.infra
+- hosts: web
+  tasks:
+    - name: install apache and php
+      apt:
+        name: ['apache2', 'php7.3']
+        state: present
+
+# install MariaDB on s3
+- hosts: db
+  tasks:
+    - name: install mariadb
+      apt:
+        name: ['mariadb']
+        state: present
+
+# install nfs on s4.infra
+- hosts: nfs
+  tasks:
+    - name: install nfs on s4
+      apt:
+        name: ['nfs']
+        state: present

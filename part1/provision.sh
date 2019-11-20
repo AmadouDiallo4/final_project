@@ -1,4 +1,5 @@
 #!/bin/sh
+# Maintainer: Ana SCHNEIDER ing.anacs@gmail.com
 
 set -e
 set -u
@@ -7,11 +8,11 @@ HOSTNAME="$(hostname)"
 
 export DEBIAN_FRONTEND=noninteractive
 
+# Install the basics we need
 apt-get update
 apt-get install -y \
     apt-transport-https \
     ca-certificates \
-    git \
     curl \
     wget \
     vim \
@@ -19,14 +20,14 @@ apt-get install -y \
     python3 \
     software-properties-common
 
-if [ "$HOSTNAME" = "control" ]; then
+if [ "$HOSTNAME" = "s0.infra" ]; then
 	apt-get install -y \
-		ansible	
+		ansible
 
 	# J'ajoute les deux clefs sur le noeud de controle
 	mkdir -p /root/.ssh
-	cp /vagrant/ansible_rsa /home/vagrant/.ssh/ansible_rsa
-	cp /vagrant/ansible_rsa.pub /home/vagrant/.ssh/ansible_rsa.pub
+	cp /vagrant/part1_rsa /home/vagrant/.ssh/part1_rsa
+	cp /vagrant/part1_rsa.pub /home/vagrant/.ssh/part1_rsa.pub
 	chmod 0600 /home/vagrant/.ssh/*_rsa # ICI
 	chown -R vagrant:vagrant /home/vagrant/.ssh
 
@@ -46,17 +47,17 @@ sed -i \
 	/etc/hosts
 cat >> /etc/hosts <<MARK
 ## BEGIN PROVISION
-192.168.50.250      control
-192.168.50.10       server0
-192.168.50.20       server1
-192.168.50.30       server2
-192.168.50.40       server3
+192.168.50.200      s0.infra
+192.168.50.20       s1.infra
+192.168.50.30       s2.infra
+192.168.50.40       s3.infra
+192.168.50.50       s4.infra
 ## END PROVISION
 MARK
 
 # J'autorise la clef sur tous les serveurs
 mkdir -p /root/.ssh
-cat /vagrant/ansible_rsa.pub >> /root/.ssh/authorized_keys
+cat /vagrant/part1_rsa.pub >> /root/.ssh/authorized_keys
 
 # Je vire les duplicata (potentiellement gênant pour SSH)
 sort -u /root/.ssh/authorized_keys > /root/.ssh/authorized_keys.tmp

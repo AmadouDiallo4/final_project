@@ -21,8 +21,8 @@ Vagrant.configure("2") do |config|
   # Create s0.infra with intranet (eth1) and internet (eth0)
   config.vm.define 'control' do |machine|
     machine.vm.hostname = 'control'
-    machine.vm.network "private_network", bridge: "eth0", ip: "192.168.50.200"
-    machine.vm.network "private_network", bridge: "eth1", ip: "10.0.0.10"
+    machine.vm.network "private_network", bridge: "eth1", ip: "192.168.50.200"
+    machine.vm.network "private_network", bridge: "eth0", ip: "10.0.0.10"
   end
 
   # Create our servers (1 to 4) with intranet and internet

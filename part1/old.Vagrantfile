@@ -21,18 +21,16 @@ Vagrant.configure("2") do |config|
   # Create s0.infra with intranet (eth1) and internet (eth0)
   config.vm.define 's0.infra' do |machine|
     machine.vm.hostname = 's0.infra'
-    machine.vm.network "private_network", bridge: "eth0", ip: "192.168.50.200"
-    machine.vm.network "private_network", bridge: "eth1", ip: "10.0.0.10"
+    machine.vm.network "private_network"
   end
 
   # Create our servers (1 to 4) with intranet and internet
   4.times do |idx|
     config.vm.define "s#{idx + 1}.infra" do |machine|
       machine.vm.hostname = "s#{idx + 1}.infra" 
-      machine.vm.network "private_network", bridge: "eth0", ip: "192.168.50.#{idx + 1 * 10 + 10}"
-      machine.vm.network "private_network", bridge: "eth1", ip: "10.0.0.#{idx + 11}"
-      if idx == 0 
-        machine.vm.network "forwarded_port", guest: 80, host: 80
+      machine.vm.network "private_network"
+      if idx > 0 
+        machine.vm.network "forwarded_port", guest: 80, host: 1080
         machine.vm.network "forwarded_port", guest: 8080, host: 8080
       end
     end
@@ -40,5 +38,4 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "shell", path: "provision.sh"
 end
-
 

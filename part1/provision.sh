@@ -21,8 +21,7 @@ apt-get install -y \
     software-properties-common
 
 if [ "$HOSTNAME" = "s0.infra" ]; then
-	apt-get install -y \
-		ansible
+	apt-get install -y ansible
 
 	# J'ajoute les deux clefs sur le noeud de controle
 	mkdir -p /root/.ssh

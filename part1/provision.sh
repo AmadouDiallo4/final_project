@@ -1,5 +1,5 @@
 #!/bin/sh
-# Maintainer: Ana SCHNEIDER ing.anacs@gmail.com
+# Maintainer: FRANKLIN TETYNOUH franklin.tetynouh@gmail.com
 
 set -e
 set -u
@@ -18,7 +18,6 @@ apt-get install -y \
     vim \
     gnupg2 \
     python3 \
-    software-properties-common
 
 if [ "$HOSTNAME" = "s0.infra" ]; then
 	apt-get install -y ansible
@@ -41,18 +40,18 @@ if [ "$HOSTNAME" = "s0.infra" ]; then
 	MARK
 fi
 
-sed -i \
-	-e '/^## BEGIN PROVISION/,/^## END PROVISION/d' \
-	/etc/hosts
-cat >> /etc/hosts <<MARK
+#sed -i \
+#	-e '/^## BEGIN PROVISION/,/^## END PROVISION/d' \
+#	/etc/hosts
+#cat >> /etc/hosts <<MARK
 ## BEGIN PROVISION
-192.168.50.200      s0.infra
-192.168.50.20       s1.infra
-192.168.50.30       s2.infra
-192.168.50.40       s3.infra
-192.168.50.50       s4.infra
+#192.168.50.200      s0.infra
+#192.168.50.20       s1.infra
+#192.168.50.30       s2.infra
+#192.168.50.40       s3.infra
+#192.168.50.50       s4.infra
 ## END PROVISION
-MARK
+#MARK
 
 # J'autorise la clef sur tous les serveurs
 mkdir -p /root/.ssh

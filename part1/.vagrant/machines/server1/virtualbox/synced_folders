@@ -1,0 +1,1 @@
+{"rsync":{"/vagrant":{"type":"rsync","guestpath":"/vagrant","hostpath":"C:/Users/Fitec/Desktop/DEVOPS2/tp_glen/cours-ansible","disabled":false,"__vagrantfile":true,"owner":"vagrant","group":"vagrant"}}}

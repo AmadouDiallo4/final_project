@@ -12,7 +12,7 @@
   tasks:
     - name: install apache and php
       apt:
-        name: ['apache2', 'php7.3']
+        name: ['apache2', 'php7.3', 'nfs-common']
         state: present
 
 # install MariaDB on s3
@@ -20,7 +20,7 @@
   tasks:
     - name: install mariadb
       apt:
-        name: ['mariadb']
+        name: ['mariadb-server']
         state: present
 
 # install nfs on s4.infra
@@ -28,5 +28,5 @@
   tasks:
     - name: install nfs on s4
       apt:
-        name: ['nfs']
+        name: ['nfs-kernel-server', 'nfs-common']
         state: present

@@ -64,11 +64,15 @@
       with_items:
         - db
         - log
-     - name: Write new configuration file
-       template:
-         src: templates/mysql
-         dest: /etc/mysql/my.cnf
-
+    - name: Write new configuration file
+      template:
+        src: /etc/mysql/my.cnf
+        dest: /home/vagrant/ansible/templates/mysql/my.cnf
+        ownner: mysql
+        group: mysql
+        mode: '0600'
+        backup: yes
+        remote_src: yes
 
 # install nfs on s4.infra
 - hosts: nfs

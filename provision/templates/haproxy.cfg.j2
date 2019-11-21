@@ -63,13 +63,3 @@ backend web_servers
 	s1.infra 192.168.50.20:80 check
 	s2.infra 192.168.50.30:80 check 
 
-{% if haproxy_testing|default(false) %}
-	acl authorized http_auth(haproxy_test_users)
-	acl wp-cron path_beg -i /wp-cron.php
-	http-request auth realm haproxy.eu unless authorized or wp-cron
-
-userlist haproxy_test_users
-	user amadou password X/UgQ53BouggY
-{% endif %}
-
-haproxy_testing: true

@@ -37,7 +37,8 @@ defaults
 	errorfile 503 /etc/haproxy/errors/503.http
 	errorfile 504 /etc/haproxy/errors/504.http
 
-listen  haproxy  0.0.0.0:80
+listen  haproxy
+	bind :80
 	mode http
 	# stats
 	stats enable
@@ -50,17 +51,17 @@ listen  haproxy  0.0.0.0:80
 	option httpclose
 	option forwardfor
 	# les serveurs web
-	s1.infra devops.com 192.168.50.20
-	s2.infra 192.168.50.30	
+#	s1.infra devops.com 192.168.50.20 check
+#	s2.infra 192.168.50.30	check
 
 frontend haproxy
- 	bind *:80
+ 	bind :80
 	defautl_backend web_servers
 
 backend web_servers
-	balance roundbin
-	s1.infra 192.168.50.20:80 
-	s2.infra 192.168.50.30:80 
+	balance roundrobin
+	s1.infra 192.168.50.20:80 check
+	s2.infra 192.168.50.30:80 check 
 
 {% if haproxy_testing|default(false) %}
 	acl authorized http_auth(haproxy_test_users)

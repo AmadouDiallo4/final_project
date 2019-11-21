@@ -15,18 +15,25 @@
       apt:
         name: haproxy
         state: present
-    - name: restart haproxy
-      service: 
-        name: haproxy
-        state: started
+        
+        #- name: restart haproxy
+        #service: 
+        # name: haproxy
+        #state: started
+
+    - name: Enable init script
+      replace: 
+        dest='/etc/default/haproxy'
+        regexp='ENABLED=0'
+        replace='ENABLED=1'
 
     - name: configure HAProxy
       template:
-        src: haproxy.cfg.j2
+        src: templates/haproxy.cfg.j2
         dest: /etc/haproxy/haproxy.cfg
         owner: vagrant
         group: vagrant
-        mode: 
+        
 
 # install Apache and PHP on s1 and s2.infra
 - hosts: web

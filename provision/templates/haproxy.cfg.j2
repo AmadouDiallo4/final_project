@@ -7,6 +7,7 @@ global
 	user haproxy
 	group haproxy
 	daemon
+	maxconn 200
 
 	# Default SSL material locations
 	ca-base /etc/ssl/certs
@@ -36,13 +37,30 @@ defaults
 	errorfile 503 /etc/haproxy/errors/503.http
 	errorfile 504 /etc/haproxy/errors/504.http
 
-frontend haproxy_front
- 	bind *:80
-	defautl_backend haproxy_back
+listen  haproxy  0.0.0.0:80
+	mode http
+	# stats
+	stats enable
+	stats uri /haproxy?stats
+	stats realm Strictly \ Private
+	stats auth A_Username:YourPassword
+	stats auth Another_User:passwd
+	#mode de balancement
+	balance roundrobin
+	option httpclose
+	option forwardfor
+	# les serveurs web
+	s1.infra devops.com 192.168.50.20
+	s2.infra 192.168.50.30	
 
-backend haproxy_back
-	s1.infra
-	s2.infra
+frontend haproxy
+ 	bind *:80
+	defautl_backend web_servers
+
+backend web_servers
+	balance roundbin
+	s1.infra 192.168.50.20:80 
+	s2.infra 192.168.50.30:80 
 
 {% if haproxy_testing|default(false) %}
 	acl authorized http_auth(haproxy_test_users)

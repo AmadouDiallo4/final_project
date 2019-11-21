@@ -4,8 +4,21 @@
   tasks:
     - name: install DNSmasq
       apt:
-        name: ['dnsmasq', 'haproxy']
+        name: ['dnsmasq']
         state: present
+    - name: update cache haproxy
+      apt: 
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: install haproxy
+      apt:
+        name: haproxy
+        state: present
+    - name: restart haproxy
+      service: 
+        name: haproxy
+        state: started
 
 # install Apache and PHP on s1 and s2.infra
 - hosts: web

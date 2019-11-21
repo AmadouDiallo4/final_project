@@ -48,9 +48,22 @@
   tasks:
     - name: install mariadb
       apt:
-        name: ['mariadb-server']
+        name: "{{ item }}"
         state: present
-
+      with_items:
+          - mariadb-client
+          - mariadb-common
+          - mariadb-server
+    - name: Create Mariadb directories
+      file: 
+        path: /data/{{item}}
+        state: directory
+        owner: mysql
+        group: mysql
+        recurse: yes
+      with_items:
+        - db
+        - log
 # install nfs on s4.infra
 - hosts: nfs
   tasks:

@@ -64,6 +64,12 @@
       with_items:
         - db
         - log
+     - name: Write new configuration file
+       template:
+         src: templates/mysql
+         dest: /etc/mysql/my.cnf
+
+
 # install nfs on s4.infra
 - hosts: nfs
   tasks:

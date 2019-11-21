@@ -11,22 +11,20 @@ export DEBIAN_FRONTEND=noninteractive
 # Install the basics we need
 apt-get update
 apt-get install -y \
-    apt-transport-https \
     ca-certificates \
-    curl \
     wget \
     gnupg2 \
-    python3 \
-    software-properties-common
+    software-properties \
+    python3 
 
-if [ "$HOSTNAME" = "s0.infra" ]; then
+if [ "$HOSTNAME" = "control" ]; then
 	apt-get install -y vim git make ansible
 
 	# J'ajoute les deux clefs sur le noeud de controle
 	mkdir -p /root/.ssh
 	cp /vagrant/part1_rsa /home/vagrant/.ssh/part1_rsa
 	cp /vagrant/part1_rsa.pub /home/vagrant/.ssh/part1_rsa.pub
-	chmod 0600 /home/vagrant/.ssh/*_rsa # ICI
+	chmod 0600 /home/vagrant/.ssh/*_rsa 
 	chown -R vagrant:vagrant /home/vagrant/.ssh
 
 	sed -i \
@@ -40,18 +38,18 @@ if [ "$HOSTNAME" = "s0.infra" ]; then
 	MARK
 fi
 
-#sed -i \
-#	-e '/^## BEGIN PROVISION/,/^## END PROVISION/d' \
-#	/etc/hosts
-#cat >> /etc/hosts <<MARK
-### BEGIN PROVISION
-#192.168.50.200      s0.infra
+sed -i \
+	-e '/^## BEGIN PROVISION/,/^## END PROVISION/d' \
+	/etc/hosts
+cat >> /etc/hosts <<MARK
+## BEGIN PROVISION
+192.168.50.10      s0.infra
 #192.168.50.20       s1.infra
 #168.50.30       s2.infra
 #192.168.50.40       s3.infra
 #192.168.50.50       s4.infra
-## END PROVISION
-#MARK
+# END PROVISION
+MARK
 
 # J'autorise la clef sur tous les serveurs
 mkdir -p /root/.ssh

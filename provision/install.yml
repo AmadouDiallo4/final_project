@@ -1,0 +1,60 @@
+---
+# install DNSmasq and HAProxy on s0.infra
+- hosts: control
+  tasks:
+    - name: install DNSmasq
+      apt:
+        name: ['dnsmasq']
+        state: present
+    - name: update cache haproxy
+      apt: 
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: install haproxy
+      apt:
+        name: haproxy
+        state: present
+    - name: restart haproxy
+      service: 
+        name: haproxy
+        state: started
+
+# install Apache and PHP on s1 and s2.infra
+- hosts: web
+  tasks:
+    - name: install apache and php
+      apt:
+        name: ['apache2', 'php7.3', 'nfs-common']
+        state: present
+
+# download wordpress
+    - name: Download WordPress
+      get_url:
+        url: 'https://fr.wordpress.org/latest-fr_FR.tar.gz'
+        dest: '/usr/src/wordpress.tar.gz'
+
+# extract wordpress on /var/www
+    - name: Extract WordPress
+      unarchive:
+        src: '/usr/src/wordpress.tar.gz'
+        dest: '/var/www/'
+        remote_src: 'yes'
+        extra_opts:
+          - --strip-components=1
+
+# install MariaDB on s3
+- hosts: db
+  tasks:
+    - name: install mariadb
+      apt:
+        name: ['mariadb-server']
+        state: present
+
+# install nfs on s4.infra
+- hosts: nfs
+  tasks:
+    - name: install nfs on s4
+      apt:
+        name: ['nfs-kernel-server', 'nfs-common']
+        state: present

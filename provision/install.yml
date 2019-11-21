@@ -20,6 +20,14 @@
         name: haproxy
         state: started
 
+    - name: configure HAProxy
+      template:
+        src: haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+        owner: vagrant
+        group: vagrant
+        mode: 
+
 # install Apache and PHP on s1 and s2.infra
 - hosts: web
   tasks:

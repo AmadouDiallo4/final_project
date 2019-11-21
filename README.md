@@ -3,8 +3,8 @@ Copy the master branch on your computer, in the directory you choose.
 
 `git clone https://github.com/schneiderana/final_project.git -b master`
 
-# Create ssh-key:
-Create a ssh-key named **part1_rsa** with the following command, inside the directoruy **part1**.
+# Generate a ssh-key:
+Generate a ssh-key named **part1_rsa** with the following command, inside the directoruy **part1**.
 
 `cd part1`
 `ssh-keygen -f part1_rsa`

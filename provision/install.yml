@@ -66,16 +66,16 @@
         - log
     - name: Write new configuration file
       template:
-        src: templates/mysql/my.cnf.j2
+        src: ./templates/mysql/my.cnf.j2
         dest: /etc/mysql/my.cnf
         owner: mysql
         group: mysql
         mode: '0600'
-        remote_src: 'yes'
+        remote_src: 'no'
 
     - name: Ensure Mariadb start
       service: 
-        name: mariadb-server
+        name: mysql
         state: started
         enabled: true
       tags: mariadb

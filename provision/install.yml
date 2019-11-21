@@ -66,13 +66,19 @@
         - log
     - name: Write new configuration file
       template:
-        src: /etc/mysql/my.cnf
-        dest: /home/vagrant/ansible/templates/mysql/my.cnf
-        ownner: mysql
+        src: templates/mysql/my.cnf.j2
+        dest: /etc/mysql/my.cnf
+        owner: mysql
         group: mysql
         mode: '0600'
-        backup: yes
-        remote_src: yes
+        remote_src: 'yes'
+
+    - name: Ensure Mariadb start
+      service: 
+        name: mariadb-server
+        state: started
+        enabled: true
+      tags: mariadb
 
 # install nfs on s4.infra
 - hosts: nfs

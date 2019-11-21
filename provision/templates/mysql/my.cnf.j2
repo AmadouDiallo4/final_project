@@ -1,0 +1,5 @@
+# add under the [mysqld] section
+
+server-id		= {{ server_id  }}
+report_host		= {{ s3.infra }}
+innodb_buffer_pool_size	= {{ (ansible_memtotal_mb * 0.8) | int }}

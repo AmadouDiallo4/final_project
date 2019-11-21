@@ -1,5 +1,6 @@
 ---
-# install DNSmasq and HAProxy on s0.infra
+# working on s0.infra (control)
+# install DNSmasq and HAProxy
 - hosts: control
   tasks:
     - name: install DNSmasq
@@ -20,7 +21,8 @@
         name: haproxy
         state: started
 
-# install Apache and PHP on s1 and s2.infra
+# working on s1 and s2.infra (web)
+# install Apache and PHP
 - hosts: web
   tasks:
     - name: install apache and php
@@ -34,16 +36,58 @@
         url: 'https://fr.wordpress.org/latest-fr_FR.tar.gz'
         dest: '/usr/src/wordpress.tar.gz'
 
-# extract wordpress on /var/www
+# extract wordpress
+    - name: ensure wordpress exists
+      file:
+        path: /usr/src/wordpress
+        state: directory
+
     - name: Extract WordPress
       unarchive:
         src: '/usr/src/wordpress.tar.gz'
-        dest: '/var/www/'
+        dest: '/usr/src/wordpress/'
         remote_src: 'yes'
         extra_opts:
           - --strip-components=1
 
-# install MariaDB on s3
+# configure php and apache2
+    - name: create a directory for virtual hosts data
+      file:
+        path: "/var/www/{{ item.dns }}"
+        state: directory
+      with_items: "{{ apache_virtual_hosts }}"
+
+    - name: sync with rsync
+      synchronize:
+        src: /usr/src/wordpress/
+        dest: "/var/www/{{ item.dns }}/"
+      with_items: "{{ apache_virtual_hosts }}"  
+      delegate_to: "{{ inventory_hostname }}"
+
+    - name: ensure correct permissions
+      file:
+        path: "/var/www/{{ item.dns }}/"
+        owner: www-data
+        group: www-data
+      with_items: "{{ apache_virtual_hosts }}"
+
+    - name: create virtual hosts configuration
+      template:
+        src: etc.apache2.sites-available.item.conf.j2
+        dest: "/etc/apache2/sites-available/{{ item.dns }}.conf"
+      with_items: "{{ apache_virtual_hosts }}"
+
+    - name: Enable site
+      command: "a2ensite {{ item.dns }}"
+      with_items: "{{ apache_virtual_hosts }}"
+
+    - name: Restart apache
+      service:
+        name: apache2
+        state: restarted
+
+# working on s3.infra (db)
+# install MariaDB
 - hosts: db
   tasks:
     - name: install mariadb

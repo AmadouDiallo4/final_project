@@ -11,20 +11,23 @@ export DEBIAN_FRONTEND=noninteractive
 # Install the basics we need
 apt-get update
 apt-get install -y \
+    apt-transport-https \
     ca-certificates \
+    curl \
     wget \
+    vim \
     gnupg2 \
-    software-properties \
-    python3 
+    python3 \
+    software-properties-common
 
 if [ "$HOSTNAME" = "control" ]; then
-	apt-get install -y vim git make ansible
+	apt-get install -y git ansible
 
 	# J'ajoute les deux clefs sur le noeud de controle
 	mkdir -p /root/.ssh
 	cp /vagrant/part1_rsa /home/vagrant/.ssh/part1_rsa
 	cp /vagrant/part1_rsa.pub /home/vagrant/.ssh/part1_rsa.pub
-	chmod 0600 /home/vagrant/.ssh/*_rsa 
+	chmod 0600 /home/vagrant/.ssh/*_rsa # ICI
 	chown -R vagrant:vagrant /home/vagrant/.ssh
 
 	sed -i \
@@ -43,12 +46,13 @@ sed -i \
 	/etc/hosts
 cat >> /etc/hosts <<MARK
 ## BEGIN PROVISION
-192.168.50.10      s0.infra
-#192.168.50.20       s1.infra
-#168.50.30       s2.infra
-#192.168.50.40       s3.infra
-#192.168.50.50       s4.infra
-# END PROVISION
+192.168.50.200      control
+192.168.50.20       s0.infra
+192.168.50.30       s1.infra
+192.168.50.40       s2.infra
+192.168.50.50       s3.infra
+192.168.50.60       s4.infra
+## END PROVISION
 MARK
 
 # J'autorise la clef sur tous les serveurs
@@ -66,4 +70,3 @@ chmod 0644 /root/.ssh/config
 chmod 0700 /root/.ssh
 
 echo "SUCCESS."
-

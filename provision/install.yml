@@ -1,6 +1,6 @@
 ---
 # install DNSmasq and HAProxy on s0.infra
-- hosts: control
+- hosts: s0.infra
   tasks:
     - name: install DNSmasq
       apt:

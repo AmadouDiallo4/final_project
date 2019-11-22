@@ -46,6 +46,11 @@
 # install MariaDB on s3
 - hosts: db
   tasks:
+    - name: Install the Python dependencies 
+      apt:
+        name: python-mysqldb
+        state: present
+
     - name: install mariadb
       apt:
         name: "{{ item }}"
@@ -54,6 +59,8 @@
           - mariadb-client
           - mariadb-common
           - mariadb-server
+
+
     - name: Create Mariadb directories
       file: 
         path: /data/{{item}}
@@ -80,16 +87,20 @@
         enabled: true
       tags: mariadb
 
-      #    - name: Create MariaDB databse
-      # mysql_db:
-      # name: mabase
-      #  state: present
 
-      # - name: Create MariDB username and password
-      # mysql_user: 
-      # login_user: root
-      # login_password: root
-      # name: 
+    - name: Create MariaDB databse with name 'mabase'
+      mysql_db:
+        name: mabase
+        #login_root: root
+        #login_password: root
+        #login_host: localhost
+        state: present
+    
+        #- name: Create MariDB username and password
+      #mysql_user: 
+      #login_user: root
+        #login_password: root
+        # state: present
 
 
 # install nfs on s4.infra

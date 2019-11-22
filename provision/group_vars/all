@@ -2,3 +2,6 @@ apache_virtual_hosts:
   - dns: devops.com
   - dns: devsec.com
   - dns: devsecops.com
+
+server_id:
+ - server-id=1

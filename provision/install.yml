@@ -16,13 +16,26 @@
       apt:
         name: haproxy
         state: present
-    - name: restart haproxy
-      service: 
-        name: haproxy
-        state: started
+#    - name: restart haproxy
+#      service: 
+#        name: haproxy
+#        state: started
+
+    - name: Enable init script
+      replace: 
+        dest: '/etc/default/haproxy'
+        regexp: 'ENABLED=0'
+        replace: 'ENABLED=1'
+
+    - name: configure HAProxy
+      template:
+        src: templates/haproxy.cfg.j2
+        dest: /etc/haproxy/haproxy.cfg
+        owner: vagrant
+        group: vagrant
 
 # working on s1 and s2.infra (web)
-# install Apache and PHP
+# install Apache, PHP and nfs-client
 - hosts: web
   tasks:
     - name: install apache and php
@@ -98,16 +111,77 @@
         name: apache2
         state: restarted
 
-# working on s3.infra (db)
-# install MariaDB
-- hosts: db
-  tasks:
+# install mariadb-client
     - name: install mariadb
       apt:
-        name: ['mariadb-server']
+        name: "{{ item }}"
+        state: present
+      with_items:
+          - mariadb-client
+          - mariadb-common
+
+# working on s3.infra (db)
+# install and configure MariaDB
+- hosts: db
+  tasks:
+    - name: Install the Python dependencies 
+      apt:
+        name: python-mysqldb
         state: present
 
-# install nfs on s4.infra
+    - name: install mariadb
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+          - mariadb-client
+          - mariadb-common
+          - mariadb-server
+
+    - name: Create Mariadb directories
+      file: 
+        path: /data/{{item}}
+        state: directory
+        owner: mysql
+        group: mysql
+        recurse: yes
+      with_items:
+        - db
+        - log
+
+    - name: Write new configuration file
+      template:
+        src: templates/mysql/my.cnf.j2
+        dest: /etc/mysql/my.cnf
+        owner: mysql
+        group: mysql
+        mode: '0600'
+        remote_src: 'no'
+
+    - name: Ensure Mariadb start
+      service: 
+        name: mysql
+        state: started
+        enabled: true
+      tags: mariadb
+
+    - name: Create MariaDB databse with name 'mabase'
+      mysql_db:
+        name: mabase
+        state: present
+    
+    - name: Create MariDB username and password
+      mysql_user: 
+        name: admin
+        host: "{{ item }}"
+        password: aaaf1234
+        priv: '*.*:ALL'
+        state: present
+      with_items:
+        - '127.0.0.1'
+        - '%'
+
+# install and configure nfs-server (s4.infra)
 - hosts: nfs
   tasks:
     - name: install nfs on s4

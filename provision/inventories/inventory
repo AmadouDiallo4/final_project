@@ -4,9 +4,6 @@ s2.infra ansible_user=root
 s3.infra ansible_user=root
 s4.infra ansible_user=root
 
-[control]
-s0.infra
-
 [web]
 s1.infra
 s2.infra

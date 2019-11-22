@@ -1,7 +1,7 @@
 ---
-# working on s0.infra (control)
+# working on s0.infra 
 # install DNSmasq and HAProxy
-- hosts: control
+- hosts: s0.infra
   tasks:
     - name: install DNSmasq
       apt:
@@ -29,6 +29,7 @@
       apt:
         name: ['apache2', 'php7.3', 'nfs-common']
         state: present
+# mount our nfs
 
 # download wordpress
     - name: Download WordPress
@@ -102,3 +103,24 @@
       apt:
         name: ['nfs-kernel-server', 'nfs-common']
         state: present
+# create /home/data
+    - name: ensure mountable dir exists
+      file:
+        path: /home/data
+        mode: 777
+        owner: root
+        group: root
+        state: directory
+# copy /etc/exports
+    - name: copy /etc/exports
+      template:
+        src: exports.j2
+        dest: /etc/exports
+        owner: root
+        group: root
+# restart NFS server
+    - name: restart NFS
+      service:
+        name: 'nfs-kernel-server'
+        state: restarted
+

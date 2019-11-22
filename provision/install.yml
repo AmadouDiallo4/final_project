@@ -30,6 +30,17 @@
         name: ['apache2', 'php7.3', 'nfs-common']
         state: present
 # mount our nfs
+    - name: ensure /mnt/nfs exists
+      file:
+        path: /mnt/nfs
+        state: directory
+    - name: mount /mt/nfs
+      mount:
+        path: /mnt/nfs
+        src: s4.infra:/home/data/
+        fstype: 'nfs'
+        opts: 'defaults,user,auto,noatime,bg'
+        state: present
 
 # download wordpress
     - name: Download WordPress

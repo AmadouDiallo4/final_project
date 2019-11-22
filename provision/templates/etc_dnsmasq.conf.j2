@@ -1,0 +1,21 @@
+# Dnsmasq configuration
+# {{ ansible_managed }}
+
+
+# Dnsmasq configuration
+# {{ ansible_managed }}
+
+domain-needed
+bogus-priv
+filterwin2k
+ 
+localise-queries
+
+expand-hosts
+no-negcache
+resolv-file=/tmp/resolv.conf.auto
+ 
+dhcp-authoritative
+dhcp-leasefile=/tmp/dhcp.leases
+# Plage DHCP
+dhcp-range=192.168.1.100,192.168.1.150,12h

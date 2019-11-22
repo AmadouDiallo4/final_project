@@ -1,2 +1,2 @@
 all:
-	ansible-playbook -i inventories/inventory install.yml
+	ansible-playbook -i inventories/inventory -v install.yml

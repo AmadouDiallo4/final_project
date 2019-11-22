@@ -4,8 +4,8 @@
 - hosts: s0.infra
   tasks:
     - name: install DNSmasq
-      apt:
-        name: ['dnsmasq']
+      package:
+        name: dnsmasq
         state: present
     - name: update cache haproxy
       apt: 
@@ -20,7 +20,20 @@
       service: 
         name: haproxy
         state: started
-
+    
+    - name: Set configuration file
+      template:
+        src: etc_dnsmasq.conf.j2
+        dest: /etc/dnsmasq.conf
+        validate: 'dnsmasq --test --conf-file=%s'
+        #notify: restart dnsmasq
+      
+    - name: Make sure Dnsmasq is running
+      service:
+        name: dnsmasq
+        state: started
+        enabled: yes
+      
 # working on s1 and s2.infra (web)
 # install Apache and PHP
 - hosts: web

@@ -80,16 +80,16 @@
         enabled: true
       tags: mariadb
 
-    - name: Create MariaDB databse
-      mysql_db:
-        name: mabase
-        state: present
+      #    - name: Create MariaDB databse
+      # mysql_db:
+      # name: mabase
+      #  state: present
 
-    - name: Create MariDB username and password
-      mysql_user: 
-        login_user: root
-        login_password: root
-        name: 
+      # - name: Create MariDB username and password
+      # mysql_user: 
+      # login_user: root
+      # login_password: root
+      # name: 
 
 
 # install nfs on s4.infra

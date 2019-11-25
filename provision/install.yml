@@ -56,7 +56,7 @@
   tasks:
     - name: install apache and php
       apt:
-        name: ['apache2', 'php7.3', 'nfs-common']
+        name: ['apache2', 'php7.3-mysql', 'nfs-common']
         state: present
 # mount our nfs
     - name: ensure /mnt/nfs exists

@@ -3,7 +3,7 @@
 server-id		= 1
 report_host		= {{ ansible_hostname }}
 innodb_buffer_pool_size	= {{ (ansible_memtotal_mb * 0.8) | int }}
-bind-address=s3.infra
+bind-address		= 0.0.0.0
 
 [client]
 port            = 3306

@@ -7,10 +7,26 @@
       apt:
         name: ['dnsmasq']
         state: present
-    - name: update cache haproxy
-      apt: 
-        update_cache: yes
-        cache_valid_time: 3600
+#    - name: update cache haproxy
+#      apt: 
+#        update_cache: yes
+
+    - name: Set configuration file
+      template:
+        src: etc_dnsmasq.conf.j2
+        dest: /etc/dnsmasq.conf
+        validate: 'dnsmasq --test --conf-file=%s'
+
+    - name: set resolv.conf
+      template:
+        src: etc_resolv.conf.j2
+        dest: /etc/resolv.conf
+
+    - name: Make sure Dnsmasq is running
+      service:
+        name: dnsmasq
+        state: started
+        enabled: yes
 
     - name: install haproxy
       apt:
@@ -114,13 +130,9 @@
 # install mariadb-client
     - name: install mariadb
       apt:
-        name: "{{ item }}"
+        name: ['mariadb-client','mariadb-common']
         state: present
-      with_items:
-          - mariadb-client
-          - mariadb-common
 
-# working on s3.infra (db)
 # install and configure MariaDB
 - hosts: db
   tasks:
@@ -131,12 +143,8 @@
 
     - name: install mariadb
       apt:
-        name: "{{ item }}"
+        name: ['mariadb-client','mariadb-common','mariadb-server']
         state: present
-      with_items:
-          - mariadb-client
-          - mariadb-common
-          - mariadb-server
 
     - name: Create Mariadb directories
       file: 
@@ -173,13 +181,15 @@
     - name: Create MariDB username and password
       mysql_user: 
         name: admin
-        host: "{{ item }}"
+        host: '%'
         password: aaaf1234
         priv: '*.*:ALL'
         state: present
-      with_items:
-        - '127.0.0.1'
-        - '%'
+
+    - name: restart MariaDB 
+      service: 
+        name: mysql
+        state: restarted
 
 # install and configure nfs-server (s4.infra)
 - hosts: nfs

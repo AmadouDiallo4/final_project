@@ -1,0 +1,42 @@
+#Dnsmasq configuration
+# ansible_managed 
+#put "nameserver 127.0.0.1" in /etc/resolv.dnsmasq or /etc/resolv.conf
+#to force local processes to send queries to dnsmasq 
+#By default, dnsmasq reads /etc/resolv.conf 
+#nameserver 127.0.0.1
+#nameserver 81.253.149.10
+#search mondomaine.local or so.infra
+#to discover the IP addresses of the upstream nameservers it should use
+
+#les serveurs écoutent sur le reseau
+#listen-address=192.168.50.10
+
+#Ecoute requetes DNS du coté réseau local eth1
+interface=eth1
+
+#port du DNS
+#port=53
+
+#Blocage du gateway, on évite de fournir du trafic DHCP/DNS inutile du coté internet
+domain-needed
+bogus-priv
+
+#serveur s0.infra comme DNS principal
+localise-queries
+domain=infra
+
+#Les requetes passent s0.infra qui possede un ha proxy
+server=/infra/1.1.1.1
+
+#Plage d'adressage ip dynamique DHCP, remplir le repertoire /etc/hosts de noms de serveurs
+dhcp-range=eth1,192.168.1.100,192.168.1.199,1h
+
+#rajoute le nom de domain local au repertoire /etc/hosts
+expand-hosts
+
+#DHCP est le seul serveur dnsmasq
+dhcp-authoritative
+
+# Include another lot of configuration options.
+#resolv-file=/etc/resolv.conf
+#conf-file=/etc/resolv.conf
